@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宿泊者情報登録 - 本館</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --stone: #4a4440;
+    --paper: #f5f0e8;
+    --cream: #faf7f2;
+    --accent: #3a5c7c;
+    --accent-light: #507aa0;
+    --border: #c0cfd8;
+    --success: #4a7c59;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Serif JP', serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(154,184,200,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(58,92,124,0.08) 0%, transparent 50%);
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); position: relative; }
+  header::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 60px; height: 2px; background: var(--accent); }
+  .logo-mark { font-family: 'Shippori Mincho', serif; font-size: 11px; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 12px; }
+  h1 { font-family: 'Shippori Mincho', serif; font-size: 26px; font-weight: 600; color: var(--ink); letter-spacing: 0.05em; line-height: 1.4; }
+  .subtitle { margin-top: 8px; font-size: 13px; color: var(--stone); font-weight: 300; letter-spacing: 0.1em; }
+  .progress-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 40px; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--stone); transition: all 0.3s ease; }
+  .step-dot.active { border-color: var(--accent); background: var(--accent); color: white; }
+  .step-dot.done { border-color: var(--success); background: var(--success); color: white; }
+  .step-line { height: 1px; width: 48px; background: var(--border); transition: background 0.3s ease; }
+  .step-line.done { background: var(--success); }
+  .card { background: white; border: 1px solid var(--border); border-radius: 2px; padding: 40px; box-shadow: 0 2px 20px rgba(26,20,16,0.06); display: none; animation: fadeIn 0.35s ease; }
+  .card.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .section-title { font-family: 'Shippori Mincho', serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 6px; letter-spacing: 0.05em; }
+  .section-desc { font-size: 12px; color: var(--stone); margin-bottom: 28px; letter-spacing: 0.05em; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .field { margin-bottom: 20px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--stone); letter-spacing: 0.15em; margin-bottom: 6px; text-transform: uppercase; }
+  label .required { color: var(--accent); margin-left: 3px; }
+  label .optional { color: #aaa; font-weight: 300; font-size: 10px; margin-left: 4px; text-transform: none; letter-spacing: 0; }
+  input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 2px; background: var(--cream);
+    font-family: 'Noto Serif JP', serif; font-size: 14px; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(58,92,124,0.08); background: white; }
+  textarea { resize: vertical; min-height: 72px; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a4440' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .guest-block { background: var(--paper); border: 1px solid var(--border); border-radius: 2px; padding: 24px; margin-bottom: 16px; }
+  .guest-block-title { font-family: 'Shippori Mincho', serif; font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 16px; }
+  .btn-primary { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 2px; font-family: 'Shippori Mincho', serif; font-size: 15px; font-weight: 600; letter-spacing: 0.15em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+  .btn-primary:hover { background: var(--accent-light); }
+  .btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--stone); border: 1px solid var(--border); border-radius: 2px; font-family: 'Noto Serif JP', serif; font-size: 13px; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .confirm-section { margin-bottom: 20px; }
+  .confirm-label { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
+  .confirm-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted var(--border); font-size: 13px; gap: 16px; }
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-key { color: var(--stone); flex-shrink: 0; font-size: 12px; }
+  .confirm-val { color: var(--ink); text-align: right; }
+  .success-screen { text-align: center; padding: 20px 0; }
+  .success-icon { width: 56px; height: 56px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .success-icon svg { width: 28px; height: 28px; }
+  .success-title { font-family: 'Shippori Mincho', serif; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  .success-msg { font-size: 13px; color: var(--stone); line-height: 1.8; }
+  .error-msg { font-size: 12px; color: #c0392b; margin-top: 4px; display: none; }
+  input.error, textarea.error { border-color: #c0392b; }
+  @media (max-width: 480px) { .card { padding: 24px 20px; } .container { padding: 24px 16px 60px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo-mark">宿泊者情報登録</div>
+    <h1>ご宿泊情報のご入力</h1>
+    <p class="subtitle">チェックイン前にご記入いただきありがとうございます</p>
+  </header>
+
+  <div class="progress-bar" id="progressBar">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+
+  <!-- Step 1: 宿泊情報 -->
+  <div class="card active" id="step1">
+    <div class="section-title">宿泊情報</div>
+    <div class="section-desc">ご宿泊の日程をご入力ください</div>
+    <div class="field">
+      <label>宿泊開始日 <span class="required">*</span></label>
+      <input type="date" id="checkInDate">
+      <div class="error-msg" id="err-checkInDate">宿泊開始日をご入力ください</div>
+    </div>
+    <div class="field">
+      <label>宿泊日数 <span class="required">*</span></label>
+      <select id="nights">
+        <option value="">選択してください</option>
+        <option value="1">1泊</option>
+        <option value="2">2泊</option>
+        <option value="3">3泊</option>
+        <option value="other">4泊以上</option>
+      </select>
+      <div class="error-msg" id="err-nights">宿泊日数をご選択ください</div>
+    </div>
+    <div class="field" id="customNightsField" style="display:none;">
+      <label>宿泊日数（泊数）<span class="required">*</span></label>
+      <input type="number" id="customNights" min="4" max="30" placeholder="例：5">
+      <div class="error-msg" id="err-customNights">泊数をご入力ください（4以上）</div>
+    </div>
+    <div class="field">
+      <label>宿泊人数 <span class="required">*</span><span class="optional">代表者を含む合計人数</span></label>
+      <input type="number" id="guestCount" min="1" max="8" placeholder="1〜8の数字を入力">
+      <div class="error-msg" id="err-guestCount">宿泊人数をご入力ください（1〜8）</div>
+    </div>
+    <button class="btn-primary" onclick="goToStep2()">次へ　→</button>
+  </div>
+
+  <!-- Step 2: 代表者情報 -->
+  <div class="card" id="step2">
+    <div class="section-title">代表者情報</div>
+    <div class="section-desc">ご予約代表者の情報をご入力ください</div>
+    <div class="field">
+      <label>氏名 <span class="required">*</span></label>
+      <input type="text" id="rep-name" placeholder="例：山田 太郎">
+      <div class="error-msg" id="err-rep-name">氏名をご入力ください</div>
+    </div>
+    <div class="field">
+      <label>住所 <span class="required">*</span></label>
+      <textarea id="rep-address" placeholder="例：東京都渋谷区〇〇1-2-3"></textarea>
+      <div class="error-msg" id="err-rep-address">住所をご入力ください</div>
+    </div>
+    <div class="field">
+      <label>年齢 <span class="required">*</span></label>
+      <input type="number" id="rep-age" min="1" max="120" placeholder="例：35">
+      <div class="error-msg" id="err-rep-age">年齢をご入力ください</div>
+    </div>
+    <div class="field">
+      <label>国籍 <span class="required">*</span></label>
+      <select id="rep-nationality" onchange="toggleRepPassport()"><option value="">選択してください</option><option value="日本">日本</option><option value="韓国">韓国</option><option value="台湾">台湾</option><option value="香港">香港</option><option value="中国">中国</option><option value="タイ">タイ</option><option value="シンガポール">シンガポール</option><option value="マレーシア">マレーシア</option><option value="インドネシア">インドネシア</option><option value="フィリピン">フィリピン</option><option value="ベトナム">ベトナム</option><option value="インド">インド</option><option value="英国">英国</option><option value="ドイツ">ドイツ</option><option value="フランス">フランス</option><option value="イタリア">イタリア</option><option value="スペイン">スペイン</option><option value="ロシア">ロシア</option><option value="米国">米国</option><option value="カナダ">カナダ</option><option value="オーストラリア">オーストラリア</option><option value="その他">その他</option></select>
+      <div class="error-msg" id="err-rep-nationality">国籍をご選択ください</div>
+    </div>
+    <div class="field" id="rep-passport-field" style="display:none;">
+      <label>旅券番号 <span class="required">*</span></label>
+      <input type="text" id="rep-passport" placeholder="例：AB1234567">
+      <div class="error-msg" id="err-rep-passport">旅券番号をご入力ください</div>
+    </div>
+    <button class="btn-primary" onclick="goToStep3()">次へ　→</button>
+    <button class="btn-secondary" onclick="goToStep(1)">← 戻る</button>
+  </div>
+
+  <!-- Step 3: 同行者情報 -->
+  <div class="card" id="step3">
+    <div class="section-title">同行者情報</div>
+    <div class="section-desc" id="companionDesc">同行者の情報をご入力ください</div>
+    <div id="companionFields"></div>
+    <button class="btn-primary" onclick="goToStep4()">確認画面へ　→</button>
+    <button class="btn-secondary" onclick="goToStep(2)">← 戻る</button>
+  </div>
+
+  <!-- Step 4: 確認 -->
+  <div class="card" id="step4">
+    <div class="section-title">入力内容の確認</div>
+    <div class="section-desc">以下の内容でよろしければ送信してください</div>
+    <div id="confirmContent"></div>
+    <button class="btn-primary" onclick="submitForm()">送信する</button>
+    <button class="btn-secondary" onclick="goToStep(3)">← 戻る</button>
+  </div>
+
+  <!-- Step 5: 完了 -->
+  <div class="card" id="step5">
+    <div class="success-screen">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <div class="success-title">送信が完了しました</div>
+      <p class="success-msg">ご記入いただきありがとうございます。<br>チェックイン時にお待ちしております。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  let companionCount = 0;
+
+  document.getElementById('nights').addEventListener('change', function() {
+    document.getElementById('customNightsField').style.display = this.value === 'other' ? 'block' : 'none';
+  });
+
+  function getNights() {
+    const sel = document.getElementById('nights').value;
+    if (sel === 'other') return parseInt(document.getElementById('customNights').value) || 0;
+    return parseInt(sel) || 0;
+  }
+
+  function formatDate(val) {
+    if (!val) return '';
+    const d = new Date(val);
+    return d.toLocaleDateString('ja-JP', {year:'numeric', month:'2-digit', day:'2-digit'});
+  }
+
+  function getCheckOutDate() {
+    const startVal = document.getElementById('checkInDate').value;
+    if (!startVal) return '';
+    const start = new Date(startVal);
+    start.setDate(start.getDate() + getNights());
+    return start.toLocaleDateString('ja-JP', {year:'numeric', month:'2-digit', day:'2-digit'});
+  }
+
+  function showError(id, show) {
+    const el = document.getElementById('err-' + id);
+    const input = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+    if (input) input.classList.toggle('error', show);
+  }
+
+  function toggleCompPassport(i) {
+    const nat = document.getElementById(`comp${i}-nationality`).value;
+    document.getElementById(`comp${i}-passport-field`).style.display = (nat && nat !== '日本') ? 'block' : 'none';
+  }
+
+  function toggleRepPassport() {
+    const nat = document.getElementById('rep-nationality').value;
+    document.getElementById('rep-passport-field').style.display = (nat && nat !== '日本') ? 'block' : 'none';
+  }
+
+  function goToStep2() {
+    let valid = true;
+    if (!document.getElementById('checkInDate').value) { showError('checkInDate', true); valid = false; } else showError('checkInDate', false);
+    const nights = document.getElementById('nights').value;
+    if (!nights) { showError('nights', true); valid = false; } else showError('nights', false);
+    if (nights === 'other') {
+      const cn = parseInt(document.getElementById('customNights').value);
+      if (!cn || cn < 4) { showError('customNights', true); valid = false; } else showError('customNights', false);
+    }
+    const gc = document.getElementById('guestCount').value;
+    if (gc === '' || parseInt(gc) < 1 || parseInt(gc) > 8) { showError('guestCount', true); valid = false; } else showError('guestCount', false);
+    if (!valid) return;
+    companionCount = parseInt(document.getElementById('guestCount').value) - 1;
+    goToStep(2);
+  }
+
+  function goToStep3() {
+    let valid = true;
+    ['rep-name', 'rep-address', 'rep-age', 'rep-nationality'].forEach(id => {
+      const val = document.getElementById(id).value.trim();
+      if (!val) { showError(id, true); valid = false; } else showError(id, false);
+    });
+    const repNat = document.getElementById('rep-nationality').value;
+    if (repNat && repNat !== '日本') {
+      const pp = document.getElementById('rep-passport').value.trim();
+      if (!pp) { showError('rep-passport', true); valid = false; } else showError('rep-passport', false);
+    }
+    if (!valid) return;
+    buildCompanionFields();
+    goToStep(3);
+  }
+
+  function buildCompanionFields() {
+    const container = document.getElementById('companionFields');
+    container.innerHTML = '';
+    if (companionCount === 0) {
+      document.getElementById('companionDesc').textContent = '同行者はいません。確認画面へお進みください。';
+      return;
+    }
+    document.getElementById('companionDesc').textContent = `同行者${companionCount}名の情報をご入力ください`;
+    for (let i = 1; i <= companionCount; i++) {
+      const block = document.createElement('div');
+      block.className = 'guest-block';
+      block.innerHTML = `
+        <div class="guest-block-title">同行者 ${i}名目</div>
+        <div class="field">
+          <label>氏名 <span class="required">*</span></label>
+          <input type="text" id="comp${i}-name" placeholder="例：山田 花子">
+          <div class="error-msg" id="err-comp${i}-name">氏名をご入力ください</div>
+        </div>
+        <div class="field">
+          <label>住所 <span class="required">*</span></label>
+          <textarea id="comp${i}-address" placeholder="例：東京都渋谷区〇〇1-2-3"></textarea>
+          <div class="error-msg" id="err-comp${i}-address">住所をご入力ください</div>
+        </div>
+        <div class="field">
+          <label>年齢 <span class="required">*</span></label>
+          <input type="number" id="comp${i}-age" min="1" max="120" placeholder="例：28">
+          <div class="error-msg" id="err-comp${i}-age">年齢をご入力ください</div>
+        </div>
+        <div class="field">
+          <label>国籍 <span class="required">*</span></label>
+          <select id="comp${i}-nationality" onchange="toggleCompPassport(${i})"><option value="">選択してください</option><option value="日本">日本</option><option value="韓国">韓国</option><option value="台湾">台湾</option><option value="香港">香港</option><option value="中国">中国</option><option value="タイ">タイ</option><option value="シンガポール">シンガポール</option><option value="マレーシア">マレーシア</option><option value="インドネシア">インドネシア</option><option value="フィリピン">フィリピン</option><option value="ベトナム">ベトナム</option><option value="インド">インド</option><option value="英国">英国</option><option value="ドイツ">ドイツ</option><option value="フランス">フランス</option><option value="イタリア">イタリア</option><option value="スペイン">スペイン</option><option value="ロシア">ロシア</option><option value="米国">米国</option><option value="カナダ">カナダ</option><option value="オーストラリア">オーストラリア</option><option value="その他">その他</option></select>
+          <div class="error-msg" id="err-comp${i}-nationality">国籍をご選択ください</div>
+        </div>
+        <div class="field" id="comp${i}-passport-field" style="display:none;">
+          <label>旅券番号 <span class="required">*</span></label>
+          <input type="text" id="comp${i}-passport" placeholder="例：AB1234567">
+          <div class="error-msg" id="err-comp${i}-passport">旅券番号をご入力ください</div>
+        </div>
+      `;
+      container.appendChild(block);
+    }
+  }
+
+  function goToStep4() {
+    let valid = true;
+    for (let i = 1; i <= companionCount; i++) {
+      ['name', 'address', 'age', 'nationality'].forEach(f => {
+        const val = document.getElementById(`comp${i}-${f}`).value.trim();
+        if (!val) { showError(`comp${i}-${f}`, true); valid = false; } else showError(`comp${i}-${f}`, false);
+      });
+      const nat = document.getElementById(`comp${i}-nationality`).value;
+      if (nat && nat !== '日本') {
+        const pp = document.getElementById(`comp${i}-passport`).value.trim();
+        if (!pp) { showError(`comp${i}-passport`, true); valid = false; } else showError(`comp${i}-passport`, false);
+      }
+    }
+    if (!valid) return;
+    buildConfirmScreen();
+    goToStep(4);
+  }
+
+  function buildConfirmScreen() {
+    const container = document.getElementById('confirmContent');
+    const nights = getNights();
+    let html = `
+      <div class="confirm-section">
+        <div class="confirm-label">宿泊情報</div>
+        <div class="confirm-row"><span class="confirm-key">宿泊開始日</span><span class="confirm-val">${formatDate(document.getElementById('checkInDate').value)}</span></div>
+        <div class="confirm-row"><span class="confirm-key">宿泊終了日</span><span class="confirm-val">${getCheckOutDate()}</span></div>
+        <div class="confirm-row"><span class="confirm-key">宿泊日数</span><span class="confirm-val">${nights}泊</span></div>
+        <div class="confirm-row"><span class="confirm-key">宿泊人数</span><span class="confirm-val">${companionCount + 1}名</span></div>
+      </div>
+      <hr class="divider">
+      <div class="confirm-section">
+        <div class="confirm-label">代表者</div>
+        <div class="confirm-row"><span class="confirm-key">氏名</span><span class="confirm-val">${document.getElementById('rep-name').value}</span></div>
+        <div class="confirm-row"><span class="confirm-key">住所</span><span class="confirm-val">${document.getElementById('rep-address').value}</span></div>
+        <div class="confirm-row"><span class="confirm-key">年齢</span><span class="confirm-val">${document.getElementById('rep-age').value}歳</span></div>
+        <div class="confirm-row"><span class="confirm-key">国籍</span><span class="confirm-val">${document.getElementById('rep-nationality').value}</span></div>
+        ${document.getElementById('rep-nationality').value !== '日本' && document.getElementById('rep-nationality').value ? `<div class="confirm-row"><span class="confirm-key">旅券番号</span><span class="confirm-val">${document.getElementById('rep-passport').value}</span></div>` : ''}
+      </div>
+    `;
+    for (let i = 1; i <= companionCount; i++) {
+      html += `
+        <hr class="divider">
+        <div class="confirm-section">
+          <div class="confirm-label">同行者 ${i}名目</div>
+          <div class="confirm-row"><span class="confirm-key">氏名</span><span class="confirm-val">${document.getElementById(`comp${i}-name`).value}</span></div>
+          <div class="confirm-row"><span class="confirm-key">住所</span><span class="confirm-val">${document.getElementById(`comp${i}-address`).value}</span></div>
+          <div class="confirm-row"><span class="confirm-key">年齢</span><span class="confirm-val">${document.getElementById(`comp${i}-age`).value}歳</span></div>
+          <div class="confirm-row"><span class="confirm-key">国籍</span><span class="confirm-val">${document.getElementById(`comp${i}-nationality`).value}</span></div>
+          ${document.getElementById(`comp${i}-nationality`).value !== '日本' && document.getElementById(`comp${i}-nationality`).value ? `<div class="confirm-row"><span class="confirm-key">旅券番号</span><span class="confirm-val">${document.getElementById(`comp${i}-passport`).value}</span></div>` : ''}
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  function goToStep(n) {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    document.getElementById('step' + n).classList.add('active');
+    for (let i = 1; i <= 4; i++) {
+      const dot = document.getElementById('dot' + i);
+      dot.classList.remove('active', 'done');
+      if (i < n) { dot.classList.add('done'); dot.innerHTML = '✓'; }
+      else if (i === n) { dot.classList.add('active'); dot.innerHTML = i; }
+      else dot.innerHTML = i;
+      if (i < 4) document.getElementById('line' + i).classList.toggle('done', i < n);
+    }
+    currentStep = n;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  async function submitForm() {
+    const btn = document.querySelector('#step4 .btn-primary');
+    btn.textContent = '送信中...';
+    btn.disabled = true;
+    const companions = [];
+    for (let i = 1; i <= companionCount; i++) {
+      companions.push({
+        name: document.getElementById(`comp${i}-name`).value,
+        address: document.getElementById(`comp${i}-address`).value,
+        age: document.getElementById(`comp${i}-age`).value
+      });
+    }
+    const payload = {
+      checkInDate: document.getElementById('checkInDate').value,
+      nights: getNights(),
+      rep: {
+        name: document.getElementById('rep-name').value,
+        address: document.getElementById('rep-address').value,
+        age: document.getElementById('rep-age').value
+      },
+      companions: companions
+    };
+    try {
+      await fetch('https://script.google.com/macros/s/AKfycbzAEVuBL_-MVCSSg0SpEX0kkHrxjEivvRG4Q44_sD_EUHY9c58t52sBlF_-viTblRh7/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) { console.error(e); }
+    document.getElementById('step4').classList.remove('active');
+    document.getElementById('step5').classList.add('active');
+    document.getElementById('progressBar').style.display = 'none';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+</script>
+</body>
+</html>
