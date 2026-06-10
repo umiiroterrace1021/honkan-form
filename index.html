@@ -187,6 +187,7 @@
       </div>
       <div class="success-title">送信が完了しました</div>
       <p class="success-msg">ご記入いただきありがとうございます。<br>当日は直接お部屋へお越しください。</p>
+      <button class="btn-secondary" style="max-width:300px;margin:24px auto 0;" onclick="editAgain()">← 戻って内容を修正する</button>
     </div>
   </div>
 </div>
@@ -270,7 +271,7 @@
 
   function buildCompanionFields() {
     const container = document.getElementById('companionFields');
-    container.innerHTML = '';
+    var __prevComp = {}; document.querySelectorAll('[id^="comp"]').forEach(function(__e){ __prevComp[__e.id]=__e.value; }); container.innerHTML = '';
     if (companionCount === 0) {
       document.getElementById('companionDesc').textContent = '同行者はいません。確認画面へお進みください。';
       return;
@@ -309,6 +310,8 @@
       `;
       container.appendChild(block);
     }
+    Object.keys(__prevComp).forEach(function(__k){ var __e=document.getElementById(__k); if(__e && __prevComp[__k]!==undefined && __prevComp[__k]!=='') __e.value=__prevComp[__k]; });
+    for (var __i=1; __i<=companionCount; __i++){ try{ toggleCompPassport(__i); }catch(__er){} }
   }
 
   function goToStep4() {
@@ -381,6 +384,14 @@
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
+  function editAgain() {
+    var b = document.querySelector('#step4 .btn-primary');
+    if (b) { b.textContent = '送信する'; b.disabled = false; }
+    var pb = document.getElementById('progressBar'); if (pb) pb.style.display = 'flex';
+    document.getElementById('step5').classList.remove('active');
+    goToStep(1);
+  }
+
   async function submitForm() {
     const btn = document.querySelector('#step4 .btn-primary');
     btn.textContent = '送信中...';
@@ -404,7 +415,7 @@
       companions: companions
     };
     try {
-      await fetch('https://script.google.com/macros/s/AKfycbzAEVuBL_-MVCSSg0SpEX0kkHrxjEivvRG4Q44_sD_EUHY9c58t52sBlF_-viTblRh7/exec', {
+      await fetch('https://script.google.com/macros/s/AKfycbyeyyZCXbSNXFnIrOkKdm6lt3wGNT4jIvLDG3ULFzxyJzWRhZ4FW9QwjshitROg3AY-/exec', {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
